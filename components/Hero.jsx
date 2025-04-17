@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import AuthPopup from './AuthPopup';
 import { Play, Users, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 
 export default function HeroSection() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -58,19 +59,23 @@ export default function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
             <motion.button
               whileHover={{ scale: 1.05 }}
-              onClick={() => handleAuthOpen('brand', 'register')}
               className="px-5 py-2.5 sm:px-6 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full flex items-center justify-center gap-2 hover:shadow-lg transition-shadow text-sm sm:text-base w-full sm:w-auto"
             >
               <Users size={18} />
+              <Link
+              href="/auth"
+              >
               Join as Brand
+              </Link>
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
-              onClick={() => handleAuthOpen('influencer', 'register')}
               className="px-5 py-2.5 sm:px-6 sm:py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-full flex items-center justify-center gap-2 hover:shadow-lg transition-shadow text-sm sm:text-base w-full sm:w-auto"
             >
               <Sparkles size={18} />
+              <Link href="/auth">
               Join as Influencer
+              </Link>
             </motion.button>
           </div>
           {/* Watch How It Works Button (Commented Out) */}

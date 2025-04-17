@@ -5,17 +5,14 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react';
-import axios from 'axios';
-import AuthPopup from './AuthPopup';
+import { Menu, X, LayoutDashboard, LogOut } from 'lucide-react';
+import api from '@/utils/api';
 
 export default function Header() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(null);
   const [userInfo, setUserInfo] = useState({ name: '', image: '' });
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [authMode, setAuthMode] = useState('login');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const API_BASE = 'https://api.fluencerz.com/api';
@@ -27,9 +24,7 @@ export default function Header() {
       if (token && type) {
         try {
           const endpoint = type === 'brand' ? `${API_BASE}/brand/me` : `${API_BASE}/influencer/me`;
-          const res = await axios.get(endpoint, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const res = await api.get(endpoint);
           setIsLoggedIn(true);
           setUserType(type);
           setUserInfo({
@@ -59,18 +54,11 @@ export default function Header() {
     router.push('/');
   };
 
-  const handleAuthOpen = (mode) => {
-    setAuthMode(mode);
-    setIsAuthOpen(true);
-    setIsMobileMenuOpen(false);
-  };
-
   const navLinks = [
     { label: 'About Us', href: '/about' },
-    { label: 'For Influencers', href: '/influencers' }, // Updated to reflect a potential page
-    { label: 'For Brands', href: '/brands' }, // Matches your ForBrandsPage
+    { label: 'For Influencers', href: '/influencers' },
+    { label: 'For Brands', href: '/brands' },
     { label: 'Contact Us', href: '/contact' },
-
   ];
 
   const dropdownVariants = {
@@ -79,7 +67,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-linear-to-bl from-violet-500 to-fuchsia-500 shadow-md py-8 px-10 sticky top-0 z-50">
+    <header className="bg-gradient-to-bl from-violet-500 to-fuchsia-500 shadow-md  sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Logo */}
         <Link href="/" className="flex items-center">
@@ -88,7 +76,7 @@ export default function Header() {
             height={70}
             width={320}
             alt="Fluencerz Logo"
-            className="object-contain absolute"
+            className="object-contain"
           />
         </Link>
 
@@ -151,20 +139,22 @@ export default function Header() {
             </div>
           ) : (
             <div className="flex gap-3">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                onClick={() => handleAuthOpen('login')}
-                className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
-              >
-                Login
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                onClick={() => handleAuthOpen('register')}
-                className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:shadow-lg transition-shadow"
-              >
-                Signup
-              </motion.button>
+              <motion.div whileHover={{ scale: 1.05 }}>
+                <Link
+                  href="/auth"
+                  className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                >
+                  Login
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }}>
+                <Link
+                  href="/auth"
+                  className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:shadow-lg transition-shadow"
+                >
+                  Signup
+                </Link>
+              </motion.div>
             </div>
           )}
         </div>
@@ -217,29 +207,25 @@ export default function Header() {
               </>
             ) : (
               <div className="flex flex-col gap-3">
-                <button
-                  onClick={() => handleAuthOpen('login')}
-                  className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-full"
+                <Link
+                  href="/auth"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-full text-center"
                 >
                   Login
-                </button>
-                <button
-                  onClick={() => handleAuthOpen('register')}
-                  className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full"
+                </Link>
+                <Link
+                  href="/auth"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-center"
                 >
                   Signup
-                </button>
+                </Link>
               </div>
             )}
           </nav>
         </motion.div>
       )}
-
-      <AuthPopup
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        initialMode={authMode}
-      />
     </header>
   );
 }
