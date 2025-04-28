@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/utils/api';
 import InfluencerCard from '@/components/InfluencerCard';
 import AuthPopup from '@/components/AuthPopup';
@@ -53,69 +53,91 @@ export default function InfluencerMarketplace() {
     fetchInfluencers();
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
+  const cardVariants = {
+    hidden: { x: '50vw', opacity: 0 },
+    visible: { x: 0, opacity: 1, transition: { type: 'spring', stiffness: 100, damping: 20 } },
+    exit: { x: '-50vw', opacity: 0, transition: { duration: 0.3 } },
   };
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-16 px-4 overflow-hidden">
-      {/* Overlay Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10" />
+    <section className="relative min-h-screen py-16 px-4 overflow-hidden" style={{ backgroundColor: '#1C2526' }}>
+      {/* Minimal Gradient Shimmer Background */}
+      <motion.div
+        className="absolute inset-0"
+        animate={{
+          backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: 'linear',
+        }}
+      />
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, ease: 'easeOut' }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800">
-            Discover <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">Top Influencers</span>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-blue-500">
+            Influencer Nexus
           </h1>
-          <p className="mt-4 text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-            Connect with influencers who align with your brand’s vision and goals.
+          <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto" style={{ color: '#FFFFFF' }}>
+            Connect with influencers in a sophisticated space.
           </p>
         </motion.div>
 
         {/* Filter Form */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="bg-white p-6 rounded-xl shadow-lg mb-12"
+          className="p-6 rounded-xl shadow-lg mb-12 border-2"
+          style={{ backgroundColor: '#2A3435', borderColor: '#E73C7E' }}
         >
           <form
             onSubmit={handleFilterSubmit}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
           >
             <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: '#FFFFFF' }}>
                 Search by Name
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: '#E73C7E' }} size={20} />
                 <input
                   type="text"
                   name="search"
                   placeholder="Enter name..."
                   value={filters.search}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 transition bg-gray-50"
+                  className="w-full pl-10 pr-4 py-2.5 border-2 rounded-lg focus:ring-2"
+                  style={{
+                    backgroundColor: '#1C2526',
+                    borderColor: '#673AB7', // violet
+                    color: '#FFFFFF',
+                  }}
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: '#FFFFFF' }}>
                 Niche
               </label>
               <select
                 name="niche"
                 value={filters.niche}
                 onChange={handleChange}
-                className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 transition bg-gray-50"
+                className="w-full p-2.5 border rounded-lg focus:ring-2"
+                style={{
+                  backgroundColor: '#1C2526',
+                  borderColor: '#673AB7', // violet
+                  color: '#FFFFFF',
+                }}
               >
                 <option value="">Select Niche</option>
                 {niches.map((niche) => (
@@ -126,7 +148,7 @@ export default function InfluencerMarketplace() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: '#FFFFFF' }}>
                 Platforms
               </label>
               <input
@@ -135,11 +157,16 @@ export default function InfluencerMarketplace() {
                 placeholder="e.g., Instagram, YouTube"
                 value={filters.platforms}
                 onChange={handleChange}
-                className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 transition bg-gray-50"
+                className="w-full p-2.5 border rounded-lg focus:ring-2"
+                style={{
+                  backgroundColor: '#1C2526',
+                  borderColor: '#673AB7', // violet
+                  color: '#FFFFFF',
+                }}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: '#FFFFFF' }}>
                 Min Followers
               </label>
               <input
@@ -148,11 +175,16 @@ export default function InfluencerMarketplace() {
                 placeholder="1000"
                 value={filters.minFollowers}
                 onChange={handleChange}
-                className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 transition bg-gray-50"
+                className="w-full p-2.5 border rounded-lg focus:ring-2"
+                style={{
+                  backgroundColor: '#1C2526',
+                  borderColor: '#673AB7', // violet
+                  color: '#FFFFFF',
+                }}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: '#FFFFFF' }}>
                 Max Followers
               </label>
               <input
@@ -161,15 +193,23 @@ export default function InfluencerMarketplace() {
                 placeholder="100000"
                 value={filters.maxFollowers}
                 onChange={handleChange}
-                className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 transition bg-gray-50"
+                className="w-full p-2.5 border rounded-lg focus:ring-2"
+                style={{
+                  backgroundColor: '#1C2526',
+                  borderColor: '#673AB7', // violet
+                  color: '#FFFFFF',
+                }}
               />
             </div>
             <div className="sm:col-span-2 lg:col-span-1 flex items-end">
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, boxShadow: '0 0 10px rgba(231, 60, 126, 0.6)' }}
                 whileTap={{ scale: 0.95 }}
                 type="submit"
-                className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg flex items-center justify-center gap-2 hover:from-blue-700 hover:to-purple-700 transition"
+                className="w-full py-2.5 rounded-lg flex items-center justify-center gap-2 text-white transition-all"
+                style={{
+                  backgroundColor: '#E73C7E', // dark pink button
+                }}
               >
                 <Filter size={20} />
                 Apply Filters
@@ -179,37 +219,56 @@ export default function InfluencerMarketplace() {
         </motion.div>
 
         {/* Influencer Grid */}
-        <motion.div variants={containerVariants} initial="hidden" animate="visible">
+        <AnimatePresence>
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
               {[...Array(6)].map((_, i) => (
                 <SkeletonCard key={i} />
               ))}
-            </div>
+            </motion.div>
           ) : influencers.length === 0 ? (
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center text-gray-600 text-lg"
+              exit={{ opacity: 0 }}
+              className="text-center text-lg"
+              style={{ color: '#FFFFFF' }}
             >
               No influencers found. Try adjusting your filters.
             </motion.p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {influencers.map((influencer) => (
-                <InfluencerCard
+                <motion.div
                   key={influencer.id}
-                  influencer={influencer}
-                  userType={userType}
-                  onConnect={() => {
-                    setAuthMode('login');
-                    setIsAuthOpen(true);
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  className="rounded-xl shadow-md p-4 border-2 transition-colors"
+                  style={{
+                    borderColor: '#3F51B5', // Blue border for cards
+                    backgroundColor: '#2A3435',
                   }}
-                />
+                >
+                  <InfluencerCard
+                    influencer={influencer}
+                    userType={userType}
+                    onConnect={() => {
+                      setAuthMode('login');
+                      setIsAuthOpen(true);
+                    }}
+                  />
+                </motion.div>
               ))}
             </div>
           )}
-        </motion.div>
+        </AnimatePresence>
       </div>
 
       <AuthPopup
@@ -223,12 +282,18 @@ export default function InfluencerMarketplace() {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md animate-pulse flex flex-col items-center">
-      <div className="h-24 w-24 rounded-full bg-gray-200 mb-4"></div>
-      <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
-      <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-      <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-      <div className="mt-6 h-10 w-full bg-gray-200 rounded-lg"></div>
+    <div
+      className="rounded-xl p-4 shadow-md animate-pulse border-2"
+      style={{
+        backgroundColor: '#2A3435',
+        borderColor: '#E73C7E', // dark pink border
+      }}
+    >
+      <div className="h-32 w-32 mx-auto rounded-full bg-gray-700 mb-4"></div>
+      <div className="h-5 bg-gray-700 rounded w-3/4 mx-auto mb-2"></div>
+      <div className="h-4 bg-gray-700 rounded w-1/2 mx-auto mb-2"></div>
+      <div className="h-4 bg-gray-700 rounded w-2/3 mx-auto"></div>
+      <div className="mt-6 h-10 w-full bg-gray-700 rounded-lg mx-auto"></div>
     </div>
   );
 }

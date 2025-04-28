@@ -67,26 +67,26 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-gradient-to-bl from-violet-500 to-fuchsia-500 shadow-md  sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+    <header className="bg-white/30 backdrop-blur-sm rounded-4xl w-[90vw] p-0 md:w-[80vw] from-violet-500 to-fuchsia-500 shadow-md fixed top-5 z-50 mx-auto left-1/2 transform -translate-x-1/2">
+      <div className="max-w-7xl mx-auto flex justify-between items-center px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-5">
         {/* Logo */}
         <Link href="/" className="flex items-center">
           <Image
             src="/fluencerz.png"
-            height={70}
-            width={320}
+            height={1000}
+            width={1000}
             alt="Fluencerz Logo"
-            className="object-contain"
+            className="object-contain sm:h-[50px] sm:w-[200px] md:h-[90px] md:w-[320px]"
           />
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 font-extrabold">
+        <nav className="hidden md:flex items-center space-x-4 sm:space-x-6 md:space-x-8 font-extrabold">
           {navLinks.map((link, idx) => (
             <Link
               key={idx}
               href={link.href}
-              className="text-gray-700 hover:text-blue-600 transition-colors font-extrabold text-lg"
+              className="text-gray-700 hover:text-blue-600 transition-colors font-extrabold text-sm sm:text-base md:text-lg"
             >
               {link.label}
             </Link>
@@ -94,55 +94,55 @@ export default function Header() {
         </nav>
 
         {/* Desktop Auth/User Section */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-2 sm:gap-3 md:gap-4">
           {isLoggedIn ? (
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center gap-2 focus:outline-none"
+                className="flex items-center gap-1 sm:gap-2 md:gap-2 focus:outline-none"
               >
                 <Image
                   src={userInfo.image}
                   alt={userInfo.name}
-                  width={36}
-                  height={36}
-                  className="h-9 w-9 rounded-full object-cover border border-gray-200"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 rounded-full object-cover border border-gray-200"
                 />
-                <span className="text-white font-medium hidden lg:inline">{userInfo.name}</span>
+                <span className="text-white font-medium text-xs sm:text-sm md:text-base hidden lg:inline">{userInfo.name}</span>
               </button>
               {isDropdownOpen && (
                 <motion.div
                   variants={dropdownVariants}
                   initial="hidden"
                   animate="visible"
-                  className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-10"
+                  className="absolute right-0 mt-2 w-40 sm:w-44 md:w-48 bg-white shadow-lg rounded-lg py-1 sm:py-2 md:py-2 z-10"
                 >
                   <button
                     onClick={() => {
                       router.push(userType === 'brand' ? '/dashboard/brand' : '/dashboard/influencer');
                       setIsDropdownOpen(false);
                     }}
-                    className="flex items-center gap-2 w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    className="flex items-center gap-1 sm:gap-2 md:gap-2 w-full text-left px-3 sm:px-4 md:px-4 py-1 sm:py-2 md:py-2 text-gray-700 hover:bg-gray-100 text-xs sm:text-sm md:text-base"
                   >
-                    <LayoutDashboard size={16} />
+                    <LayoutDashboard size={14} />
                     Dashboard
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                    className="flex items-center gap-1 sm:gap-2 md:gap-2 w-full text-left px-3 sm:px-4 md:px-4 py-1 sm:py-2 md:py-2 text-red-600 hover:bg-gray-100 text-xs sm:text-sm md:text-base"
                   >
-                    <LogOut size={16} />
+                    <LogOut size={14} />
                     Logout
                   </button>
                 </motion.div>
               )}
             </div>
           ) : (
-            <div className="flex gap-3">
+            <div className="flex gap-1 sm:gap-2 md:gap-3">
               <motion.div whileHover={{ scale: 1.05 }}>
                 <Link
                   href="/auth"
-                  className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                  className="px-3 py-1 sm:px-4 sm:py-2 md:px-8 md:py-4 text-xs sm:text-sm md:text-sm font-medium bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
                 >
                   Login
                 </Link>
@@ -150,7 +150,7 @@ export default function Header() {
               <motion.div whileHover={{ scale: 1.05 }}>
                 <Link
                   href="/auth"
-                  className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:shadow-lg transition-shadow"
+                  className="px-3 py-1 sm:px-4 sm:py-2 md:px-8 md:py-4 text-xs sm:text-sm md:text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:shadow-lg transition-shadow"
                 >
                   Signup
                 </Link>
@@ -164,7 +164,7 @@ export default function Header() {
           className="md:hidden text-gray-700 focus:outline-none"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
@@ -174,15 +174,15 @@ export default function Header() {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           transition={{ duration: 0.3 }}
-          className="md:hidden bg-white shadow-md mt-4 rounded-lg overflow-hidden"
+          className="md:hidden bg-white shadow-md mt-2 rounded-lg overflow-hidden"
         >
-          <nav className="flex flex-col p-4 space-y-4">
+          <nav className="flex flex-col p-3 space-y-2">
             {navLinks.map((link, idx) => (
               <Link
                 key={idx}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-700 hover:text-blue-600 font-medium"
+                className="text-gray-700 hover:text-blue-600 font-medium text-sm"
               >
                 {link.label}
               </Link>
@@ -194,30 +194,30 @@ export default function Header() {
                     router.push(userType === 'brand' ? '/dashboard/brand' : '/dashboard/influencer');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="text-gray-700 hover:text-blue-600 font-medium text-left"
+                  className="text-gray-700 hover:text-blue-600 font-medium text-left text-sm"
                 >
                   Dashboard
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="text-red-600 hover:text-red-700 font-medium text-left"
+                  className="text-red-600 hover:text-red-700 font-medium text-left text-sm"
                 >
                   Logout
                 </button>
               </>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 <Link
                   href="/auth"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-full text-center"
+                  className="px-3 py-1 text-sm font-medium bg-blue-600 text-white rounded-full text-center"
                 >
                   Login
                 </Link>
                 <Link
                   href="/auth"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-center"
+                  className="px-3 py-1 text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-center"
                 >
                   Signup
                 </Link>
