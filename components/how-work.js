@@ -13,30 +13,34 @@ export default function HowItWorksPage() {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 15, duration: 0.6 } },
   };
 
   const steps = [
     {
-      icon: <Target className="text-blue-600" size={40} />,
+      icon: <Target className="text-purple-600" size={40} />,
       title: 'Create Brand Campaign',
       description: 'Define your campaign goals, budget, and target audience to attract the right influencers.',
+      gradient: 'from-purple-600 to-pink-600',
     },
     {
-      icon: <Users className="text-purple-600" size={40} />,
+      icon: <Users className="text-red-600" size={40} />,
       title: 'Discover Influencers',
       description: 'Use our intelligent search tools to find verified influencers who align with your brand’s niche and values.',
+      gradient: 'from-red-600 to-red-100',
     },
     {
-      icon: <Mail className="text-pink-600" size={40} />,
+      icon: <Mail className="text-blue-500" size={40} />,
       title: 'Send Request',
       description: 'Easily send collaboration requests to influencers and manage communication within the platform.',
+      gradient: 'from-blue-500 to-blue-200',
     },
     {
-      icon: <BarChart2 className="text-blue-600" size={40} />,
+      icon: <BarChart2 className="text-gray-800" size={40} />,
       title: 'Track Results',
       description: 'Monitor campaign performance with real-time analytics to measure reach, engagement, and ROI.',
+      gradient: ['from-purple-600 to-pink-600', 'from-red-600 to-red-100', 'from-blue-500 to-blue-200'],
     },
   ];
 
@@ -56,10 +60,7 @@ export default function HowItWorksPage() {
   ];
 
   return (
-    <section className="relative w-full min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-16 px-4 overflow-hidden">
-      {/* Overlay Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10" />
-
+    <section className="relative w-full min-h-screen bg-white py-16 px-4 overflow-hidden">
       {/* Content */}
       <div className="relative z-10 container mx-auto max-w-5xl">
         <motion.div
@@ -71,7 +72,7 @@ export default function HowItWorksPage() {
           {/* Header */}
           <motion.div variants={itemVariants} className="text-center">
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800">
-              How <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">Fluencerz</span> Works
+              How <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-red-600 to-blue-500">Fluencerz</span> Works
             </h1>
             <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
               A simple, step-by-step guide to creating impactful influencer campaigns with Fluencerz.
@@ -79,17 +80,28 @@ export default function HowItWorksPage() {
           </motion.div>
 
           {/* Step-by-Step Cards */}
-          <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
               <motion.div
                 key={index}
                 variants={itemVariants}
-                whileHover={{ y: -5 }}
-                className="bg-white p-6 rounded-xl shadow-md flex flex-col items-center text-center"
+                whileHover={{ scale: 1.05, rotateZ: 360, transition: { duration: 0.8, ease: 'easeInOut' } }}
+                className={`bg-gradient-to-br ${Array.isArray(step.gradient) ? step.gradient[Math.floor(Date.now() / 3000) % step.gradient.length] : step.gradient} p-8 rounded-xl shadow-2xl flex flex-col items-center text-center`}
               >
-                <div className="mb-4">{step.icon}</div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">{step.title}</h3>
-                <p className="text-gray-600">{step.description}</p>
+                <div className="mb-6">
+                  <motion.div
+                    whileHover={{ scale: 1.1, transition: { duration: 0.3 } }}
+                    className="bg-white/90 rounded-full p-4 shadow-inner"
+                  >
+                    {step.icon}
+                  </motion.div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3 text-shadow-sm" style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)' }}>
+                  {step.title}
+                </h3>
+                <p className="text-white leading-relaxed" style={{ textShadow: '0.5px 0.5px 1px rgba(0, 0, 0, 0.1)' }}>
+                  {step.description}
+                </p>
               </motion.div>
             ))}
           </motion.div>
@@ -97,7 +109,7 @@ export default function HowItWorksPage() {
           {/* FAQs Section */}
           <motion.div variants={itemVariants} className="bg-white p-8 rounded-xl shadow-lg">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2 justify-center">
-              <HelpCircle className="text-purple-600" size={24} />
+              <HelpCircle className="text-blue-500" size={24} />
               Frequently Asked Questions
             </h2>
             <div className="space-y-6">

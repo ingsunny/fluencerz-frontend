@@ -1,10 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { useState } from 'react';
 import AuthPopup from './AuthPopup';
-import { MessageCircle, Loader2 } from 'lucide-react';
+import { MessageCircle, Loader2, Lock } from 'lucide-react';
 import api from '@/utils/api';
 
 export default function InfluencerCard({ influencer, userType, onConnect }) {
@@ -17,13 +18,16 @@ export default function InfluencerCard({ influencer, userType, onConnect }) {
       ? `https://api.fluencerz.com${influencer.profile_image}`
       : '/default-avatar.png'
   );
+  const router = useRouter();
+
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const isLoggedIn = !!token;
 
   const handleImageError = () => {
     setImgSrc('/default-avatar.png');
   };
 
   const handleConnect = async () => {
-    const token = localStorage.getItem('token');
     if (!token) {
       onConnect();
       return;
@@ -65,18 +69,15 @@ export default function InfluencerCard({ influencer, userType, onConnect }) {
     >
       {/* Profile Image */}
       <div className="relative mb-4">
-        <div className="relative mb-4">
-          <Image
-            src={imgSrc}
-            alt={influencer.full_name}
-            width={300}
-            height={300}
-            onError={handleImageError}
-            className="h-60 w-60 object-cover rounded-full border-4 border-pink-700"
-            loading="lazy"
-          />
-        </div>
-
+        <Image
+          src={imgSrc}
+          alt={influencer.full_name}
+          width={300}
+          height={300}
+          onError={handleImageError}
+          className="h-60 w-60 object-cover rounded-full border-4 border-pink-700"
+          loading="lazy"
+        />
       </div>
 
       {/* Influencer Name */}
@@ -93,8 +94,8 @@ export default function InfluencerCard({ influencer, userType, onConnect }) {
       </p>
 
       {/* Social Platforms */}
-      {/* {influencer.social_platforms && (
-        <div className="mt-3 flex flex-wrap justify-center gap-2">
+      {influencer.social_platforms && (
+        <div className={`mt-3 flex flex-wrap justify-center gap-2 relative ${!isLoggedIn ? 'blur-sm' : ''}`}>
           {JSON.parse(influencer.social_platforms).map((p, i) => (
             <span
               key={i}
@@ -103,12 +104,17 @@ export default function InfluencerCard({ influencer, userType, onConnect }) {
               {p.platform}: {parseInt(p.followers).toLocaleString()}
             </span>
           ))}
+          {!isLoggedIn && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg">
+              <Lock size={18} className="text-white" />
+            </div>
+          )}
         </div>
-      )} */}
+      )}
 
       {/* Followers by Country */}
-      {/* {influencer.followers_by_country && (
-        <div className="mt-3 flex flex-wrap justify-center gap-2">
+      {influencer.followers_by_country && (
+        <div className={`mt-3 flex flex-wrap justify-center gap-2 relative ${!isLoggedIn ? 'blur-sm' : ''}`}>
           {JSON.parse(influencer.followers_by_country).map((c, i) => (
             <span
               key={i}
@@ -117,8 +123,13 @@ export default function InfluencerCard({ influencer, userType, onConnect }) {
               {c.country}: {c.percentage}%
             </span>
           ))}
+          {!isLoggedIn && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg">
+              <Lock size={18} className="text-white" />
+            </div>
+          )}
         </div>
-      )} */}
+      )}
 
       {/* Error Message */}
       {error && (
@@ -131,10 +142,11 @@ export default function InfluencerCard({ influencer, userType, onConnect }) {
         whileTap={{ scale: 0.95 }}
         onClick={handleConnect}
         disabled={isSending}
-        className={`mt-6 w-full py-2.5 rounded-full text-white flex items-center justify-center gap-2 transition-colors ${isSending
+        className={`mt-6 w-full py-2.5 rounded-full text-white flex items-center justify-center gap-2 transition-colors ${
+          isSending
             ? 'bg-gray-600 cursor-not-allowed'
             : 'bg-gradient-to-r from-pink-700 to-blue-700 hover:from-pink-800 hover:to-blue-800'
-          }`}
+        }`}
       >
         {isSending ? (
           <Loader2 className="animate-spin" size={20} />

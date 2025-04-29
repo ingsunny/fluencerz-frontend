@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AuthPopup from './AuthPopup';
 import { Users, Sparkles } from 'lucide-react';
 import Link from 'next/link';
@@ -10,12 +10,26 @@ export default function HeroSection() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [userType, setUserType] = useState('brand');
+  const [displayText, setDisplayText] = useState('');
+  const fullText = "Influencer Magic";
+  const [index, setIndex] = useState(0);
 
   const handleAuthOpen = (type, mode) => {
     setUserType(type);
     setAuthMode(mode);
     setIsAuthOpen(true);
   };
+
+  // Typewriter effect
+  useEffect(() => {
+    if (index < fullText.length) {
+      const timer = setTimeout(() => {
+        setDisplayText(fullText.substring(0, index + 1));
+        setIndex(index + 1);
+      }, 150); // Adjust speed of typing here
+      return () => clearTimeout(timer);
+    }
+  }, [index, fullText]);
 
   return (
     <section className="relative w-full min-h-screen flex items-center justify-center px-4 py-16 overflow-hidden">
@@ -38,16 +52,16 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="relative text-center space-y-6  w-full p-8 rounded-3xl"
-         
+          className="relative text-center space-y-6 w-full p-8 rounded-3xl"
         >
           <h1 className="text-6xl md:text-8xl font-extrabold text-white w-full">
-            <span className="bg-clip-text  bg-gradient-to-r">
+            <span className="bg-clip-text bg-gradient-to-r">
               Connect Brands
             </span>{' '}
             with<br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-purple-600">
-              Influencer Magic
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-purple-600 inline-block">
+              {displayText}
+              <span className="animate-blink text-white ">_</span>
             </span>
           </h1>
           <p className="text-base md:text-xl text-white font-medium">

@@ -7,8 +7,8 @@ const Services = () => {
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
-            Our Services
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
+            SOCIAL PLATFORMS
           </h1>
           <p className="text-gray-700 text-lg md:text-xl max-w-3xl mx-auto">
             Fastest-growing Influencer Marketing agency in India, connecting brands with relevant influencers through our AI-driven Data.
