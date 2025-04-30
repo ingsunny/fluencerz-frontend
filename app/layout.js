@@ -1,5 +1,7 @@
 import { Limelight } from "next/font/google";
 import "./globals.css";
+import AuthWrapper from '@/components/AuthWrapper';
+
 
 
 const limelight = Limelight({
@@ -19,7 +21,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${limelight.variable} antialiased`}
       >
-        {children}
+          <AuthWrapper>
+          {children}
+        </AuthWrapper>
       </body>
     </html>
   );

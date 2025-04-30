@@ -15,24 +15,6 @@ import Media from '@/components/media';
 
 export default function Home() {
 
-  // useEffect(() => {
-  //   const lenis = new Lenis({
-  //     smooth: true,
-  //     lerp: 0.2, // Smoothness factor: 0–1
-  //   });
-
-  //   function raf(time) {
-  //     lenis.raf(time);
-  //     requestAnimationFrame(raf);
-  //   }
-
-  //   requestAnimationFrame(raf);
-
-  //   // Cleanup on unmount
-  //   return () => {
-  //     lenis.destroy();
-  //   };
-  // }, []);
 
   return (
     <>

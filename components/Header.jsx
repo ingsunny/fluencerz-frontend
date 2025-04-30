@@ -16,6 +16,7 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const API_BASE = 'https://api.fluencerz.com/api';
+  const API_image = 'https://api.fluencerz.com';
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -24,19 +25,29 @@ export default function Header() {
       if (token && type) {
         try {
           const endpoint = type === 'brand' ? `${API_BASE}/brand/me` : `${API_BASE}/influencer/me`;
-          const res = await api.get(endpoint);
+          const res = await api.get(endpoint, {
+            headers: {
+              Authorization: `Bearer ${token}`, // Ensure token is sent
+            },
+          });
           setIsLoggedIn(true);
           setUserType(type);
           setUserInfo({
             name: type === 'brand' ? res.data.company_name : res.data.full_name,
-            image: res.data.profile_image ? `${API_BASE}${res.data.profile_image}` : '/default-avatar.png',
+            image: res.data.profile_image ? `${API_image}${res.data.profile_image}` : '/default-avatar.png',
           });
         } catch (err) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('userType');
-          setIsLoggedIn(false);
-          setUserType(null);
-          setUserInfo({ name: '', image: '' });
+          // Only clear localStorage for 401 Unauthorized
+          if (err.response?.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userType');
+            setIsLoggedIn(false);
+            setUserType(null);
+            setUserInfo({ name: '', image: '' });
+          } else {
+            // Log other errors but don't clear localStorage
+            console.error('Failed to fetch user info:', err.message);
+          }
         }
       }
     };
@@ -67,7 +78,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white/30 backdrop-blur-sm rounded-4xl w-[90vw] p-0 md:w-[80vw] from-violet-500 to-fuchsia-500 shadow-md fixed top-5 z-50 mx-auto left-1/2 transform -translate-x-1/2">
+    <header className="bg-white/30 backdrop-blur-sm rounded-4xl w-[90vw] p-0 md:w-[80vw] shadow-md fixed top-5 z-50 mx-auto left-1/2 transform -translate-x-1/2">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-5">
         {/* Logo */}
         <Link href="/" className="flex items-center">
@@ -108,7 +119,9 @@ export default function Header() {
                   height={28}
                   className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 rounded-full object-cover border border-gray-200"
                 />
-                <span className="text-white font-medium text-xs sm:text-sm md:text-base hidden lg:inline">{userInfo.name}</span>
+                <span className="text-white font-medium text-xs sm:text-sm md:text-base hidden lg:inline">
+                  {userInfo.name}
+                </span>
               </button>
               {isDropdownOpen && (
                 <motion.div
@@ -141,7 +154,7 @@ export default function Header() {
             <div className="flex gap-1 sm:gap-2 md:gap-3">
               <motion.div whileHover={{ scale: 1.05 }}>
                 <Link
-                  href="/auth"
+                  href="/auth/#brandLogin"
                   className="px-3 py-1 sm:px-4 sm:py-2 md:px-8 md:py-4 text-xs sm:text-sm md:text-sm font-medium bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
                 >
                   Login
@@ -149,7 +162,7 @@ export default function Header() {
               </motion.div>
               <motion.div whileHover={{ scale: 1.05 }}>
                 <Link
-                  href="/auth"
+                  href="/auth/#brandRegister"
                   className="px-3 py-1 sm:px-4 sm:py-2 md:px-8 md:py-4 text-xs sm:text-sm md:text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:shadow-lg transition-shadow"
                 >
                   Signup
@@ -208,14 +221,14 @@ export default function Header() {
             ) : (
               <div className="flex flex-col gap-2">
                 <Link
-                  href="/auth"
+                  href="/auth/#brandLogin"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="px-3 py-1 text-sm font-medium bg-blue-600 text-white rounded-full text-center"
                 >
                   Login
                 </Link>
                 <Link
-                  href="/auth"
+                  href="/auth/#brandRegister"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="px-3 py-1 text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-center"
                 >

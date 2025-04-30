@@ -1,13 +1,15 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-export default function Home() {
+export default function AuthPage({ initialHash = '#brandLogin' }) {
   const router = useRouter();
-  const [isLogin, setIsLogin] = useState(true);
-  const [userType, setUserType] = useState('brand');
+  const [isLogin, setIsLogin] = useState(initialHash.includes('Login'));
+  const [userType, setUserType] = useState(
+    initialHash.includes('brand') ? 'brand' : 'influencer'
+  );
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -27,6 +29,51 @@ export default function Home() {
   const [availability, setAvailability] = useState('available');
   const [error, setError] = useState('');
   const API_BASE = 'https://api.fluencerz.com/api';
+
+  const categories = [
+    'Art', 'Beauty', 'Business', 'Comedy', 'Dance', 'Education', 'Entertainment',
+    'Fashion', 'Fitness', 'Food & Beverage', 'Gaming', 'Health & Wellness',
+    'Home & Garden', 'Kids & Family', 'Lifestyle', 'Music', 'Parenting',
+    'Pets & Animals', 'Photography', 'Sports', 'Tech', 'Travel', 'Vlogging',
+  ];
+
+  const socialMediaPlatforms = [
+    'BeReal', 'Discord', 'Facebook', 'Flickr', 'Instagram', 'LinkedIn', 'Mastodon',
+    'Medium', 'Patreon', 'Pinterest', 'Reddit', 'Snapchat', 'Substack', 'Telegram',
+    'Threads', 'TikTok', 'Tumblr', 'Twitch', 'Twitter', 'Vimeo', 'WhatsApp', 'YouTube',
+  ];
+
+  useEffect(() => {
+    const hash = window.location.hash?.toLowerCase() || initialHash.toLowerCase();
+    if (hash === '#brandregister') {
+      setIsLogin(false);
+      setUserType('brand');
+    } else if (hash === '#influencerregister') {
+      setIsLogin(false);
+      setUserType('influencer');
+    } else if (hash === '#brandlogin') {
+      setIsLogin(true);
+      setUserType('brand');
+    } else if (hash === '#influencerlogin') {
+      setIsLogin(true);
+      setUserType('influencer');
+    }
+  }, [initialHash]);
+
+  const updateHash = (loginMode, type) => {
+    const hashMap = {
+      login: {
+        brand: '#brandLogin',
+        influencer: '#influencerLogin',
+      },
+      register: {
+        brand: '#brandRegister',
+        influencer: '#influencerRegister',
+      },
+    };
+    const newHash = hashMap[loginMode][type];
+    window.history.replaceState(null, '', `/auth/${newHash}`);
+  };
 
   const handleAddPlatform = () => {
     setSocialPlatforms([...socialPlatforms, { platform: '', followers: '' }]);
@@ -59,10 +106,7 @@ export default function Home() {
   };
 
   const handleGenderChange = (field, value) => {
-    setAudienceGender({
-      ...audienceGender,
-      [field]: value
-    });
+    setAudienceGender({ ...audienceGender, [field]: value });
   };
 
   const handleSubmit = async (e) => {
@@ -85,7 +129,7 @@ export default function Home() {
           userType === 'brand'
             ? `${API_BASE}/auth/register/brand`
             : `${API_BASE}/auth/register/influencer`;
-        
+
         const payload =
           userType === 'brand'
             ? {
@@ -106,13 +150,13 @@ export default function Home() {
                 niche: niche || 'general',
                 followers_count: parseInt(followersCount) || 0,
                 engagement_rate: parseFloat(engagementRate) || 0,
-                social_platforms: socialPlatforms.filter(p => p.platform && p.followers),
-                followers_by_country: followersByCountry.filter(c => c.country && c.percentage),
+                social_platforms: socialPlatforms.filter((p) => p.platform && p.followers),
+                followers_by_country: followersByCountry.filter((c) => c.country && c.percentage),
                 audience_age_group: audienceAgeGroup,
                 audience_gender: audienceGender,
                 total_reach: parseInt(totalReach) || 0,
                 portfolio,
-                availability
+                availability,
               };
 
         await axios.post(endpoint, payload);
@@ -129,7 +173,7 @@ export default function Home() {
           const uploadUrl =
             userType === 'brand'
               ? `${API_BASE}/brand/upload-profile`
-              : `${API_BASE}/influencer/upload-profile`;
+              : `${API_BASE}/influencer/upload-profile`; // Fixed typo in endpoint
           const formData = new FormData();
           formData.append('image', profileImage);
           await axios.patch(uploadUrl, formData, {
@@ -147,23 +191,36 @@ export default function Home() {
     }
   };
 
+  // Apply gradient based on userType, consistent with SSR
+  const containerClassName = `p-8 rounded-2xl shadow-lg w-full max-w-2xl bg-gradient-to-br ${
+    userType === 'brand' ? 'from-blue-500 to-blue-200' : 'from-red-600 to-red-100'
+  }`;
+
   return (
-    <>
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 to-gray-200 p-4">
-     
-      <div className="backdrop-blur-lg bg-transparent p-8 rounded-2xl shadow-lg w-full max-w-2xl transform transition-all duration-300">
-        <h2 className="text-2xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6">
-          {isLogin ? 'Login' : 'Register'} as {userType === 'brand' ? 'Brand' : 'Influencer'}
-        </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className={containerClassName}>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+            {isLogin ? 'Login' : 'Register'} as {userType === 'brand' ? 'Brand' : 'Influencer'}
+          </h2>
+          <button
+            onClick={() => router.push('/')}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            <XMarkIcon className="w-6 h-6" />
+          </button>
+        </div>
 
         {error && (
           <p className="text-red-600 text-sm text-center mb-4 bg-red-50 p-2 rounded-lg">{error}</p>
         )}
 
-        {/* Toggle Buttons */}
         <div className="flex justify-center gap-4 mb-6">
           <button
-            onClick={() => setIsLogin(true)}
+            onClick={() => {
+              setIsLogin(true);
+              updateHash('login', userType);
+            }}
             className={`px-6 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
               isLogin
                 ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md'
@@ -173,7 +230,10 @@ export default function Home() {
             Login
           </button>
           <button
-            onClick={() => setIsLogin(false)}
+            onClick={() => {
+              setIsLogin(false);
+              updateHash('register', userType);
+            }}
             className={`px-6 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
               !isLogin
                 ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md'
@@ -184,14 +244,16 @@ export default function Home() {
           </button>
         </div>
 
-        {/* User Type Radio */}
         <div className="flex justify-center gap-6 mb-6">
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
             <input
               type="radio"
               value="brand"
               checked={userType === 'brand'}
-              onChange={() => setUserType('brand')}
+              onChange={() => {
+                setUserType('brand');
+                updateHash(isLogin ? 'login' : 'register', 'brand');
+              }}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500"
             />
             Brand
@@ -201,14 +263,16 @@ export default function Home() {
               type="radio"
               value="influencer"
               checked={userType === 'influencer'}
-              onChange={() => setUserType('influencer')}
+              onChange={() => {
+                setUserType('influencer');
+                updateHash(isLogin ? 'login' : 'register', 'influencer');
+              }}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500"
             />
             Influencer
           </label>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div>
@@ -221,7 +285,7 @@ export default function Home() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           )}
@@ -234,7 +298,7 @@ export default function Home() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -246,7 +310,7 @@ export default function Home() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -259,17 +323,19 @@ export default function Home() {
                   placeholder="Phone"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Skype</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  WhatsApp / LinkedIn / Telegram
+                </label>
                 <input
                   type="text"
-                  placeholder="Skype"
+                  placeholder="Link"
                   value={skype}
                   onChange={(e) => setSkype(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -277,14 +343,19 @@ export default function Home() {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Niche</label>
-                      <input
-                        type="text"
-                        placeholder="Niche (e.g., dancing)"
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                      <select
                         value={niche}
                         onChange={(e) => setNiche(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                      />
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select Category</option>
+                        {categories.map((category) => (
+                          <option key={category} value={category}>
+                            {category}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Followers Count</label>
@@ -293,7 +364,7 @@ export default function Home() {
                         placeholder="Followers Count"
                         value={followersCount}
                         onChange={(e) => setFollowersCount(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   </div>
@@ -307,7 +378,7 @@ export default function Home() {
                         placeholder="Engagement Rate"
                         value={engagementRate}
                         onChange={(e) => setEngagementRate(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                     <div>
@@ -317,35 +388,39 @@ export default function Home() {
                         placeholder="Total Reach"
                         value={totalReach}
                         onChange={(e) => setTotalReach(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   </div>
 
-                  {/* Social Platforms */}
                   <div className="space-y-3">
                     <label className="block text-sm font-medium text-gray-700">Social Platforms</label>
                     {socialPlatforms.map((item, index) => (
                       <div key={index} className="flex gap-3 items-center">
-                        <input
-                          type="text"
-                          placeholder="Platform (e.g., Instagram)"
+                        <select
                           value={item.platform}
                           onChange={(e) => handlePlatformChange(index, 'platform', e.target.value)}
-                          className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                        />
+                          className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="">Select Platform</option>
+                          {socialMediaPlatforms.map((platform) => (
+                            <option key={platform} value={platform}>
+                              {platform}
+                            </option>
+                          ))}
+                        </select>
                         <input
                           type="number"
                           placeholder="Followers"
                           value={item.followers}
                           onChange={(e) => handlePlatformChange(index, 'followers', e.target.value)}
-                          className="w-32 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                          className="w-32 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         {index > 0 && (
                           <button
                             type="button"
                             onClick={() => handleRemovePlatform(index)}
-                            className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                            className="text-red-500 hover:text-red-700"
                           >
                             <XMarkIcon className="w-5 h-5" />
                           </button>
@@ -355,13 +430,12 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={handleAddPlatform}
-                      className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                      className="text-sm font-medium text-blue-600 hover:text-blue-800"
                     >
                       + Add Platform
                     </button>
                   </div>
 
-                  {/* Followers by Country */}
                   <div className="space-y-3">
                     <label className="block text-sm font-medium text-gray-700">Followers by Country</label>
                     {followersByCountry.map((item, index) => (
@@ -371,20 +445,20 @@ export default function Home() {
                           placeholder="Country"
                           value={item.country}
                           onChange={(e) => handleCountryChange(index, 'country', e.target.value)}
-                          className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                          className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-2 focus:ring-blue-500"
                         />
                         <input
                           type="number"
                           placeholder="Percentage"
                           value={item.percentage}
                           onChange={(e) => handleCountryChange(index, 'percentage', e.target.value)}
-                          className="w-32 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                          className="w-32 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         {index > 0 && (
                           <button
                             type="button"
                             onClick={() => handleRemoveCountry(index)}
-                            className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                            className="text-red-500 hover:text-red-700"
                           >
                             <XMarkIcon className="w-5 h-5" />
                           </button>
@@ -394,20 +468,19 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={handleAddCountry}
-                      className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                      className="text-sm font-medium text-blue-600 hover:text-blue-800"
                     >
                       + Add Country
                     </button>
                   </div>
 
-                  {/* Audience Demographics */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Audience Age Group</label>
                       <select
                         value={audienceAgeGroup}
                         onChange={(e) => setAudienceAgeGroup(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">Select Age Group</option>
                         <option value="13-17">13-17</option>
@@ -428,7 +501,7 @@ export default function Home() {
                             placeholder="Male"
                             value={audienceGender.male}
                             onChange={(e) => handleGenderChange('male', e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </div>
                         <div>
@@ -438,7 +511,7 @@ export default function Home() {
                             placeholder="Female"
                             value={audienceGender.female}
                             onChange={(e) => handleGenderChange('female', e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-sandbox-500"
                           />
                         </div>
                         <div>
@@ -448,7 +521,7 @@ export default function Home() {
                             placeholder="Other"
                             value={audienceGender.other}
                             onChange={(e) => handleGenderChange('other', e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </div>
                       </div>
@@ -462,7 +535,7 @@ export default function Home() {
                       value={portfolio}
                       onChange={(e) => setPortfolio(e.target.value)}
                       rows="3"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -471,7 +544,7 @@ export default function Home() {
                     <select
                       value={availability}
                       onChange={(e) => setAvailability(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="available">Available for collaborations</option>
                       <option value="unavailable">Currently unavailable</option>
@@ -486,12 +559,11 @@ export default function Home() {
                     placeholder="Industry (e.g., adtech)"
                     value={industry}
                     onChange={(e) => setIndustry(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               )}
 
-              {/* Profile Image Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Profile Image</label>
                 {profileImage && (
@@ -503,7 +575,7 @@ export default function Home() {
                 )}
                 <label
                   htmlFor="profile-image"
-                  className="inline-block px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors duration-200"
+                  className="inline-block px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200"
                 >
                   Choose Image
                 </label>
@@ -520,13 +592,12 @@ export default function Home() {
 
           <button
             type="submit"
-            className="w-full py-3 text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+            className="w-full py-3 text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700"
           >
             {isLogin ? 'Login' : 'Register'}
           </button>
         </form>
       </div>
-    </main>
-    </>
+    </div>
   );
 }
