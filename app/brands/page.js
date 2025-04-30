@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Target, Zap, BarChart2, CheckCircle, Sparkles, Rocket } from 'lucide-react';
 import api from '@/utils/api';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 export default function ForBrandsPage() {
   const [brands, setBrands] = useState([]);
@@ -49,7 +50,7 @@ export default function ForBrandsPage() {
   return (
     <>
     <Header/>
-    <section className="relative w-full min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-16 px-4 overflow-hidden">
+    <section className="relative w-full min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-16 px-4 overflow-hidden pt-[200px]">
       {/* Overlay Gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10" />
 
