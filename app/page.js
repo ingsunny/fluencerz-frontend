@@ -12,6 +12,7 @@ import HowItWorksPage from '@/components/how-work';
 import GrowthInNumbers from '@/components/Growth';
 import OurServices from '@/components/services';
 import Media from '@/components/media';
+import InfluencerEstimator from '@/components/estimate';
 
 export default function Home() {
 
@@ -20,6 +21,7 @@ export default function Home() {
     <>
       <Header/>
       <HeroSection/>
+      <InfluencerEstimator/>
       <GrowthInNumbers/>
       <Media/>
       <InfluencerMarketplace/>
